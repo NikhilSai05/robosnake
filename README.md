@@ -54,16 +54,18 @@ The codebase is organized into multiple modules within the `src` folder:
 
 You **may** change any file in any way, **except**:
 - `DrawingLibrary.ts`, `Main.ts`, and `index.html` which are owned by different teams in this organization. Your refactored code must work with exactly the provided versions of these files.
-- `.eslintignore`, `.eslintrc.js`, and the `.vscode` folder, which are the settings that our whole organization uses. For the same reason, you should not add `eslint-ignore` comments in any files.
+- `.eslintignore`, `.eslintrc.js`, and the `.vscode` folder, which are the settings that our whole organization uses.
 - `package.json`, `tsconfig.json`, `webpack.config.js`, which are the build settings that this whole project uses.
 
 All of the other files in the codebase are your responsibility. Except for the files listed above, you can change any of the code, and you can add, rename, move, or delete any files and folders.
 
-You **must not** change the rules of the game: your code should "play" the same as the original provided code, when using the original AI agent logic.
+Your code **must** pass ESLint with no errors or warnings. You **must not** add `eslint-ignore` comments in any files.
+
+You must not change the rules of the game: your code should "play" the same as the original provided code, when using the original AI agent logic.
 
 You may organize your refactored code however you want, as long as you can argue that it makes the codebase extensible, readable, and maintainable. You are not required to use object-oriented techniques, but they may be a good fit for some parts of your code.
 
-You **should not** need any features of TypeScript except the ones that we've covered in lecture, but you **may** use any TypeScript features that you want.
+You **should not need** any features of TypeScript except the ones that we've covered in lecture, but you **may** use any TypeScript features that you want.
 
 
 ## Goals
