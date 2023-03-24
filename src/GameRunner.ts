@@ -1,6 +1,7 @@
 import { initializeAgent, Motion, agentMove } from "./Agent";
 import { scheduleNextUpdate, updateApples, updateLost } from "./DrawingLibrary";
 import { Cell, draw, GameScreen } from "./GameScreen";
+import { Player } from "./Agent";
 
 // a MaybeCell is either a Cell or the string "outside"
 export type MaybeCell = Cell | "outside";
@@ -85,122 +86,95 @@ function locationAfterMotion(motion: Motion, snake: SnakeState): Point {
   }
 }
 
-export function step(
-  stepTime: number,
-  newApplesEachStep: number,
-  screen: GameScreen,
-  snakeA: SnakeState,
-  snakeB: SnakeState,
-  snakeC: SnakeState,
-  snakeD: SnakeState
-): void {
-  // generate new apples
-  for (let i = 0; i < newApplesEachStep; i++) {
-    // random integers in the closed range [0, screen.length]
-    const x = Math.floor(Math.random() * screen.length);
-    const y = Math.floor(Math.random() * screen.length);
-    // if we generated coordinates that aren't empty, skip this apple
-    if (screen[y][x] == "empty")
-      screen[y][x] = "apple";
+
+//Took functionalities out and kept in 2 different function
+export function step
+(
+  stepTime: number,newApplesEachStep: number,screen: GameScreen,
+  snakeA: SnakeState,snakeB: SnakeState,
+  snakeC: SnakeState,snakeD: SnakeState
+): void 
+{
+
+    screen=newApples(newApplesEachStep,screen);
+
+  if (!snakeA.lost) 
+  {
+    actions(screen,snakeA,"A");
   }
 
-  // players take turns in order: A -> B -> C -> D -> A -> B -> C -> D -> ...
+  if (!snakeB.lost) 
+  {
+    actions(screen,snakeB,"B");
+  }
 
-  if (!snakeA.lost) {
-    const temp = locationAfterMotion(agentMove("A", getScreenPart(screen, snakeA)), snakeA);
-    if (temp.x < 0 || temp.y < 0 || temp.x >= screen.length || temp.y >= screen.length) // hit the edge of the screen
-      snakeA.lost = true;
+  if (!snakeC.lost) 
+  {
+    actions(screen,snakeC,"C");
+  }
+
+  if (!snakeD.lost)
+  {
+    actions(screen,snakeD,"D");
+  }
+
+//Function Definitions
+  function newApples
+  (
+    newApplesEachStep:number,
+    screen:GameScreen,
+  ): GameScreen 
+  {
+    for (let i=1;i<=newApplesEachStep;i++) 
+    {
+  
+      const M=Math.floor(screen.length*Math.random());
+      const N=Math.floor(screen.length*Math.random());
+  
+      if (screen[N][M]==="empty")
+        screen[N][M]="apple";
+    }
+  return screen;
+  }
+  
+  
+  function actions
+  (
+    screen: GameScreen,
+    snakeState: SnakeState,
+    player: Player,
+  ): void 
+  {
+    const pos=locationAfterMotion(agentMove(player,getScreenPart(screen,snakeState)),snakeState);
+  
+    if (pos.y>=screen.length||pos.x>=screen.length||pos.x<0||pos.y<0)
+      snakeState.lost=true;
+  
     else
-      switch (screen[temp.y][temp.x]) {
-        case "empty": { // make the move
-          snakeA.setPoint(temp);
-          screen[temp.y][temp.x] = "A";
+      switch (screen[pos.y][pos.x]) 
+      {
+        case "apple": 
+        {
+          snakeState.setPoint(pos);
+          snakeState.apples++;
+          screen[pos.y][pos.x]=player;
           break;
         }
-        case "apple": { // make the move and eat the apple
-          snakeA.setPoint(temp);
-          snakeA.apples++;
-          screen[temp.y][temp.x] = "A";
+  
+        case "empty": 
+        {
+          snakeState.setPoint(pos);
+          screen[pos.y][pos.x]=player;
           break;
         }
-        default: { // lose
-          snakeA.lost = true;
+  
+        default: 
+        {
+          snakeState.lost=true;
           break;
         }
       }
-  }
-
-  if (!snakeB.lost) {
-    const temp = locationAfterMotion(agentMove("B", getScreenPart(screen, snakeB)), snakeB);
-    if (temp.x < 0 || temp.y < 0 || temp.x >= screen.length || temp.y >= screen.length) // hit the edge of the screen
-      snakeB.lost = true;
-    else
-      switch (screen[temp.y][temp.x]) {
-        case "empty": { // make the move
-          snakeB.setPoint(temp);
-          screen[temp.y][temp.x] = "B";
-          break;
-        }
-        case "apple": { // make the move and eat the apple
-          snakeB.setPoint(temp);
-          snakeB.apples++;
-          screen[temp.y][temp.x] = "B";
-          break;
-        }
-        default: { // lose
-          snakeB.lost = true;
-          break;
-        }
-      }
-  }
-
-  if (!snakeC.lost) {
-    const temp = locationAfterMotion(agentMove("C", getScreenPart(screen, snakeC)), snakeC);
-    if (temp.x < 0 || temp.y < 0 || temp.x >= screen.length || temp.y >= screen.length) // hit the edge of the screen
-      snakeC.lost = true;
-    else
-      switch (screen[temp.y][temp.x]) {
-        case "empty": { // make the move
-          snakeC.setPoint(temp);
-          screen[temp.y][temp.x] = "C";
-          break;
-        }
-        case "apple": { // make the move and eat the apple
-          snakeC.setPoint(temp);
-          snakeC.apples++;
-          screen[temp.y][temp.x] = "C";
-          break;
-        }
-        default: { // lose
-          snakeC.lost = true;
-          break;
-        }
-      }
-  }
-
-  if (!snakeD.lost) {
-    const temp = locationAfterMotion(agentMove("D", getScreenPart(screen, snakeD)), snakeD);
-    if (temp.x < 0 || temp.y < 0 || temp.x >= screen.length || temp.y >= screen.length) // hit the edge of the screen
-      snakeD.lost = true;
-    else
-      switch (screen[temp.y][temp.x]) {
-        case "empty": { // make the move
-          snakeD.setPoint(temp);
-          screen[temp.y][temp.x] = "D";
-          break;
-        }
-        case "apple": { // make the move and eat the apple
-          snakeD.setPoint(temp);
-          snakeD.apples++;
-          screen[temp.y][temp.x] = "D";
-          break;
-        }
-        default: { // lose
-          snakeD.lost = true;
-          break;
-        }
-      }
-  }
+    }
 
 
   // update game screen
